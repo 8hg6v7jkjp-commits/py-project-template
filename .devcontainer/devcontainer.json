@@ -1,0 +1,58 @@
+{
+	"name": "python-devcontainer",
+	"build": {
+		"dockerfile": "Dockerfile",
+		"context": ".."
+	},
+	"containerEnv": {
+		"DISPLAY": "${localEnv:DISPLAY}",
+		"PYTHONUNBUFFERED": "1",
+		"PYTHONDONTWRITEBYTECODE": "1",
+		"UV_CACHE_DIR": "/home/vscode/.cache/uv",
+		"UV_LINK_MODE": "copy",
+		"UV_PYTHON_PREFERENCE": "only-managed",
+		"UV_PROJECT_ENVIRONMENT": "/home/vscode/.venv",
+		"UV_COMPILE_BYTECODE": "1",
+		"CLAUDE_CONFIG_DIR": "/home/vscode/.claude"
+	},
+	"features": {
+		"ghcr.io/devcontainers/features/github-cli:1": {},
+		"ghcr.io/devcontainers/features/common-utils:2": {
+			"configureZshAsDefaultShell": true
+		}
+	},
+	"runArgs": [
+		"--init",
+		"--rm"
+	],
+	"hostRequirements": {
+		"gpu": "optional"
+	},
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"python.defaultInterpreterPath": "/home/vscode/.venv/bin/python"
+			},
+			"extensions": [
+				"ms-python.python",
+				"charliermarsh.ruff",
+				"astral-sh.ty",
+				"eamodio.gitlens",
+				"tamasfe.even-better-toml",
+				"ms-toolsai.jupyter",
+				"yzhang.markdown-all-in-one"
+			]
+		}
+	},
+	"remoteUser": "vscode",
+	"containerUser": "vscode",
+	"initializeCommand": "mkdir -p ${localEnv:HOME}/.claude ${localEnv:HOME}/.codex",
+	"mounts": [
+		"source=shell_history-${devcontainerId},target=/shell_history,type=volume",
+		"source=uv-cache-${devcontainerId},target=/home/vscode/.cache/uv,type=volume",
+		"source=${localEnv:HOME}/.claude,target=/home/vscode/.claude,type=bind",
+		"source=${localEnv:HOME}/.codex,target=/home/vscode/.codex,type=bind"
+	],
+	"postCreateCommand": "sudo chown -R vscode:vscode /home/vscode/.cache && uv sync --locked",
+	"postStartCommand": "uv run prek install"
+}
